@@ -51,17 +51,4 @@
       </plugin>
     </plugins>
   </build>
-  <distributionManagement>
-    <repository>
-      <id>acv-releases</id>
-      <name>ACV Releases</name>
-      <url>http://localhost:8081/nexus/content/repositories/releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>acv-snapshots</id>
-      <name>ACV Snapshots</name>
-      <url>http://localhost:8081/nexus/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-
 </project>
