@@ -3,13 +3,13 @@ package ch.ech.address.builder;
 import ch.ech.address.PersonMailAddressInfo;
 
 public class PersonMailAddressInfoBuider {
-    private String civility;
+    private String mrMrs;
     private String title;
     private String firstName;
     private String lastName;
 
-    public PersonMailAddressInfoBuider civility(String civility) {
-        this.civility = civility;
+    public PersonMailAddressInfoBuider mrMrs(String mrMrs) {
+        this.mrMrs = mrMrs;
         return this;
     }
 
@@ -30,7 +30,7 @@ public class PersonMailAddressInfoBuider {
 
     public PersonMailAddressInfo build() {
         PersonMailAddressInfo info = new PersonMailAddressInfo();
-        info.setMrMrs(civility);
+        info.setMrMrs(mrMrs);
         info.setTitle(title);
         info.setFirstName(firstName);
         info.setLastName(lastName);

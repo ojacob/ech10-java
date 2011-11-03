@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mailAddress xmlns="http://www.ech.ch/xmlns/eCH-0010/4"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.ech.ch/xmlns/eCH-0010/4 eCH-0010-4-0.xsd">
+    <person>
+        <mrMrs>1</mrMrs>
+        <title>Responsable Développements</title>
+        <firstName>Robert</firstName>
+        <lastName>Doe</lastName>
+    </person>
+    <addressInformation>
+        <addressLine1>Chez Robert</addressLine1>
+        <addressLine2>Chalet Edelweiss</addressLine2>
+        <street>Route de Jorat</street>
+        <houseNumber>14</houseNumber>
+        <dwellingNumber>Appartement 42</dwellingNumber>
+        <postOfficeBoxNumber>3</postOfficeBoxNumber>
+        <town>Echallens</town>
+        <swissZipCode>1309</swissZipCode>
+        <swissZipCodeAddOn>26</swissZipCodeAddOn>
+        <swissZipCodeId>139</swissZipCodeId>
+        <country>CH</country>
+    </addressInformation>
+</mailAddress>
