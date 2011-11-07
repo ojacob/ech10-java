@@ -1,6 +1,9 @@
 package ch.ech.address.util;
 
+import ch.ech.address.MailAddress;
 import ch.ech.address.builder.MailAddressBuilder;
+import org.custommonkey.xmlunit.SimpleNamespaceContext;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.exceptions.XpathException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,12 +12,32 @@ import org.xml.sax.SAXException;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 
 public class MailAddressMarshallerTest {
     @Test
-    public void testMarshalling() throws IOException, SAXException, XpathException {
+    public void testMarshallingWithoutNamespace() throws IOException, SAXException, XpathException {
+        MailAddress addr = createAddressObject();
+
+        performAsserts(addr, new MailAddressMarshaller(), new LocalNameXPathQueryBuilder());
+    }
+
+    @Test
+    public void testMarshallingWithNamespace() throws IOException, SAXException, XpathException {
+        setGlobalNamespaceContext("ech10", "http://www.ech.ch/xmlns/eCH-0010/4");
+
+        // Default namespace is ech10
+        MailAddressMarshaller m = new MailAddressMarshaller(new DefaultNamespaceMapper());
+
+        MailAddress addr = createAddressObject();
+
+        performAsserts(addr, m, new NamespaceXPathQueryBuilder("ech10"));
+    }
+
+    private MailAddress createAddressObject() {
         String mrMrs = "1";
         String firstName = "Robert";
         String lastName = "Doe";
@@ -29,9 +52,6 @@ public class MailAddressMarshallerTest {
         String swissZipCodeAddOn = "26";
         int swissZipCodeId = 139;
         String country = "CH";
-
-        MailAddressMarshaller m = new MailAddressMarshaller();
-        StringWriter writer = new StringWriter();
 
         MailAddressBuilder address = MailAddressBuilder.newInstance();
         address.personMailAddressInfo().mrMrs(mrMrs).firstName(firstName).lastName(lastName);
@@ -49,47 +69,42 @@ public class MailAddressMarshallerTest {
                 .swissZipCodeId(swissZipCodeId)
                 .country(country);
 
+        return address.build();
+    }
+
+    private void performAsserts(MailAddress addr, MailAddressMarshaller m, XPathQueryBuilder xpathBuilder)
+            throws SAXException, IOException, XpathException {
+        StringWriter writer = new StringWriter();
+
         try {
-            m.marshal(address.build(), writer);
+            m.marshal(addr, writer);
         } catch (JAXBException jaxbe) {
             Assert.fail("No exception should be thrown here. Got this one : " + jaxbe.getMessage());
+            return ;
         }
 
         String xml = writer.toString();
 
-        assertXpathEvaluatesTo(mrMrs, generateXPathInPersonFor("mrMrs"), xml);
-        assertXpathEvaluatesTo(firstName, generateXPathInPersonFor("firstName"), xml);
-        assertXpathEvaluatesTo(lastName, generateXPathInPersonFor("lastName"), xml);
+        assertXpathEvaluatesTo(addr.getPerson().getMrMrs(), xpathBuilder.build("mailAddress", "person", "mrMrs"), xml);
+        assertXpathEvaluatesTo(addr.getPerson().getFirstName(), xpathBuilder.build("mailAddress", "person", "firstName"), xml);
+        assertXpathEvaluatesTo(addr.getPerson().getLastName(), xpathBuilder.build("mailAddress", "person", "lastName"), xml);
 
-        assertXpathEvaluatesTo(addressLine1, generateXPathInAddressFor("addressLine1"), xml);
-        assertXpathEvaluatesTo(addressLine2, generateXPathInAddressFor("addressLine2"), xml);
-        assertXpathEvaluatesTo(street, generateXPathInAddressFor("street"), xml);
-        assertXpathEvaluatesTo(houseNumber, generateXPathInAddressFor("houseNumber"), xml);
-        assertXpathEvaluatesTo(dwellingNumber, generateXPathInAddressFor("dwellingNumber"), xml);
-        assertXpathEvaluatesTo(String.valueOf(postOfficeBoxNumber), generateXPathInAddressFor("postOfficeBoxNumber"), xml);
-        assertXpathEvaluatesTo(town, generateXPathInAddressFor("town"), xml);
-        assertXpathEvaluatesTo(String.valueOf(swissZipCode), generateXPathInAddressFor("swissZipCode"), xml);
-        assertXpathEvaluatesTo(swissZipCodeAddOn, generateXPathInAddressFor("swissZipCodeAddOn"), xml);
-        assertXpathEvaluatesTo(String.valueOf(swissZipCodeId), generateXPathInAddressFor("swissZipCodeId"), xml);
-        assertXpathEvaluatesTo(country, generateXPathInAddressFor("country"), xml);
-
+        assertXpathEvaluatesTo(addr.getAddressInformation().getAddressLine1(), xpathBuilder.build("mailAddress", "addressInformation", "addressLine1"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getAddressLine2(), xpathBuilder.build("mailAddress", "addressInformation", "addressLine2"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getStreet(), xpathBuilder.build("mailAddress", "addressInformation", "street"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getHouseNumber(), xpathBuilder.build("mailAddress", "addressInformation", "houseNumber"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getDwellingNumber(), xpathBuilder.build("mailAddress", "addressInformation", "dwellingNumber"), xml);
+        assertXpathEvaluatesTo(String.valueOf(addr.getAddressInformation().getPostOfficeBoxNumber()), xpathBuilder.build("mailAddress", "addressInformation", "postOfficeBoxNumber"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getTown(), xpathBuilder.build("mailAddress", "addressInformation", "town"), xml);
+        assertXpathEvaluatesTo(String.valueOf(addr.getAddressInformation().getSwissZipCode()), xpathBuilder.build("mailAddress", "addressInformation", "swissZipCode"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getSwissZipCodeAddOn(), xpathBuilder.build("mailAddress", "addressInformation", "swissZipCodeAddOn"), xml);
+        assertXpathEvaluatesTo(String.valueOf(addr.getAddressInformation().getSwissZipCodeId()), xpathBuilder.build("mailAddress", "addressInformation", "swissZipCodeId"), xml);
+        assertXpathEvaluatesTo(addr.getAddressInformation().getCountry(), xpathBuilder.build("mailAddress", "addressInformation", "country"), xml);
     }
 
-    private String generateXPathInAddressFor(String fieldName) {
-        return generateXPathFor("mailAddress", "addressInformation", fieldName);
-    }
-
-    private String generateXPathInPersonFor(String fieldName) {
-        return generateXPathFor("mailAddress", "person", fieldName);
-    }
-
-    private String generateXPathFor(String... elements) {
-        StringBuilder xpath = new StringBuilder(64);
-
-        for (String elt : elements) {
-            xpath.append("/*[local-name()='").append(elt).append("']");
-        }
-
-        return xpath.toString();
+    private void setGlobalNamespaceContext(String prefix, String uri) {
+        Map<String, String> prefixMap = new HashMap<String, String>();
+        prefixMap.put(prefix, uri);
+        XMLUnit.setXpathNamespaceContext(new SimpleNamespaceContext(prefixMap));
     }
 }

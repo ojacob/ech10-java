@@ -28,7 +28,7 @@ public class MailAddressUnmarshallerTest {
         assertNotNull(result.getPerson());
 
         assertEquals("1", result.getPerson().getMrMrs());
-        assertEquals("Responsable Développements", result.getPerson().getTitle());
+        assertEquals("Responsable DÃ©veloppements", result.getPerson().getTitle());
         assertEquals("Robert", result.getPerson().getFirstName());
         assertEquals("Doe", result.getPerson().getLastName());
 

@@ -2,6 +2,7 @@ package ch.ech.address.util;
 
 import ch.ech.address.MailAddress;
 import ch.ech.address.ObjectFactory;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -15,8 +16,30 @@ import javax.xml.transform.Result;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MailAddressMarshaller {
+    private Map<String, String> registeredNamespaces;
+    private NamespacePrefixMapper namespacePrefixMapper;
+    private boolean withNamespaceMapper;
+
+    public MailAddressMarshaller() {}
+
+    public MailAddressMarshaller(NamespacePrefixMapper namespacePrefixMapper) {
+        this.namespacePrefixMapper = namespacePrefixMapper;
+        this.withNamespaceMapper = Boolean.TRUE;
+    }
+
+    public void registerNamespace(String prefix, String uri) {
+        if (registeredNamespaces == null) {
+            registeredNamespaces = new HashMap<String, String>();
+        }
+
+        registeredNamespaces.put(uri, prefix);
+        this.withNamespaceMapper = Boolean.TRUE;
+    }
+
     public void marshal(MailAddress mailAddress, XMLEventWriter writer) throws JAXBException {
         getMarshaller().marshal(createJAXBElement(mailAddress), writer);
     }
@@ -51,7 +74,15 @@ public class MailAddressMarshaller {
 
     private Marshaller getMarshaller() throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(MailAddress.class);
-        return jc.createMarshaller();
+
+        Marshaller m = jc.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        if (withNamespaceMapper) {
+            m.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespaceMapper());
+        }
+
+        return m;
     }
 
     private ObjectFactory getObjectFactory() {
@@ -60,5 +91,9 @@ public class MailAddressMarshaller {
 
     private JAXBElement<MailAddress> createJAXBElement(MailAddress mailAddress) {
         return getObjectFactory().createMailAddress(mailAddress);
+    }
+
+    private NamespacePrefixMapper getNamespaceMapper() {
+        return this.namespacePrefixMapper != null ? this.namespacePrefixMapper : new NamespaceMapper(registeredNamespaces);
     }
 }
