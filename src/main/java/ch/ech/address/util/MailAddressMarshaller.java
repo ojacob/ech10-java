@@ -96,4 +96,8 @@ public class MailAddressMarshaller {
     private NamespacePrefixMapper getNamespaceMapper() {
         return this.namespacePrefixMapper != null ? this.namespacePrefixMapper : new NamespaceMapper(registeredNamespaces);
     }
+
+    public static MailAddressMarshaller withDefaultNamespaceMapper() {
+        return new MailAddressMarshaller(new DefaultNamespaceMapper());
+    }
 }
