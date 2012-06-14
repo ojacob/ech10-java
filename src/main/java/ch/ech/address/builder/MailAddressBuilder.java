@@ -6,10 +6,12 @@ public class MailAddressBuilder {
 
     private PersonMailAddressInfoBuider personMailAddressInfoBuilder;
     private AddressInformationBuilder addressInformationBuilder;
+    private OrganisationMailAddressInfoBuilder organisationMailAddressInfoBuilder;
 
     private MailAddressBuilder() {
         personMailAddressInfoBuilder = new PersonMailAddressInfoBuider();
         addressInformationBuilder = new AddressInformationBuilder();
+        organisationMailAddressInfoBuilder = new OrganisationMailAddressInfoBuilder();
     }
 
     public static MailAddressBuilder newInstance() {
@@ -24,10 +26,15 @@ public class MailAddressBuilder {
         return addressInformationBuilder;
     }
 
+    public OrganisationMailAddressInfoBuilder organisationMailAddressInfo() {
+        return organisationMailAddressInfoBuilder;
+    }
+
     public MailAddress build() {
         MailAddress addr = new MailAddress();
         addr.setPerson(personMailAddressInfoBuilder.build());
         addr.setAddressInformation(addressInformationBuilder.build());
+        addr.setOrganisation(organisationMailAddressInfoBuilder.build());
 
         return addr;
     }

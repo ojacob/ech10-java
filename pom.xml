@@ -6,7 +6,7 @@
 
   <groupId>ch.ech</groupId>
   <artifactId>ech10</artifactId>
-  <version>0.1</version>
+  <version>0.2-SNAPSHOT</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -73,4 +73,16 @@
       </plugin>
     </plugins>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>acv-releases</id>
+      <name>ACV Releases</name>
+      <url>http://spip.etat-de-vaud.ch:8081/nexus/content/repositories/iam-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>acv-snapshots</id>
+      <name>ACV Snapshots</name>
+      <url>http://spip.etat-de-vaud.ch:8081/nexus/content/repositories/iam-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
